@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Book Finder</title>
+    <style>
+      body {
+        font-family: Arial;
+        margin: 0;
+        padding: 40px;
+        background: #f3f5f7;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      h2 {
+        margin-bottom: 20px;
+        color: #222;
+      }
+      .search-box {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 20px;
+      }
+      input {
+        width: 300px;
+        padding: 10px;
+        border: 2px solid #ddd;
+        border-radius: 6px;
+        font-size: 16px;
+      }
+      button {
+        padding: 10px 18px;
+        border: none;
+        border-radius: 6px;
+        background: #0078ff;
+        color: #fff;
+        font-size: 15px;
+        cursor: pointer;
+      }
+      button:hover {
+        background: #005fcc;
+      }
+      #results {
+        width: 360px;
+      }
+      .book {
+        background: #fff;
+        border-radius: 8px;
+        padding: 12px;
+        display: flex;
+        gap: 12px;
+        margin-bottom: 14px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.12);
+      }
+      img {
+        width: 70px;
+        height: auto;
+        border-radius: 4px;
+        background: #eee;
+      }
+      .details {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
+      .title {
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 6px;
+      }
+      .author {
+        color: #555;
+        font-size: 14px;
+      }
+    </style>
+  </head>
+  <body>
+    <h2>Book Finder</h2>
+    <div class="search-box">
+      <input id="query" placeholder="Search for a book" />
+      <button onclick="searchBooks()">Search</button>
+    </div>
+
+    <div id="results"></div>
+
+    <script>
+      async function searchBooks() {
+        const q = document.getElementById("query").value;
+        const res = await fetch(
+          `https://www.googleapis.com/books/v1/volumes?q=${q}`
+        );
+        const data = await res.json();
+        const results = document.getElementById("results");
+        results.innerHTML = "";
+
+        if (!data.items) {
+          results.innerHTML = "No books found";
+          return;
+        }
+
+        data.items.forEach((book) => {
+          const info = book.volumeInfo;
+          const image = info.imageLinks?.thumbnail || "";
+          const title = info.title || "No Title";
+          const author = info.authors?.join(", ") || "Unknown Author";
+
+          const div = document.createElement("div");
+          div.className = "book";
+          div.innerHTML = `
+                <img src="${image}">
+                <div class="details">
+                    <div class="title">${title}</div>
+                    <div class="author">${author}</div>
+                </div>
+            `;
+          results.appendChild(div);
+        });
+      }
+    </script>
+  </body>
+</html>
